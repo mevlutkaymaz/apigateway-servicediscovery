@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  service-discovery:
+    image: service-discovery
+    container_name: service-discovery
+    build:
+      context: ./service-discovery
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-network
+
+  service1:
+    image: service1
+    container_name: service1
+    build:
+      context: ./service1
+      dockerfile: Dockerfile
+    ports:
+      - "9001:9001"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-discovery:8761/eureka/
+    networks:
+      - microservices-network
+
+  service2:
+    image: service2
+    container_name: service2
+    build:
+      context: ./service2
+      dockerfile: Dockerfile
+    ports:
+      - "9002:9002"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-discovery:8761/eureka/
+    networks:
+      - microservices-network
+
+  api-gateway:
+    image: api-gateway
+    container_name: api-gateway
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-discovery:8761/eureka/
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
